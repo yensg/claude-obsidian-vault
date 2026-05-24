@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; background: #1e1e1e; color: #dcddde; width: 900px; height: 580px; display: flex; flex-direction: column; overflow: hidden; }
+  .titlebar { background: #2b2b2b; height: 38px; display: flex; align-items: center; padding: 0 16px; gap: 8px; border-bottom: 1px solid #111; flex-shrink: 0; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .red { background: #ff5f57; } .yellow { background: #ffbd2e; } .green { background: #28c840; }
+  .app-title { color: #888; font-size: 12px; margin-left: 12px; }
+  .main { display: flex; flex: 1; overflow: hidden; }
+  .sidebar { width: 220px; background: #252525; border-right: 1px solid #111; padding: 8px 0; overflow-y: auto; flex-shrink: 0; }
+  .vault-name { padding: 6px 12px; color: #a0a0a0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .folder { padding: 3px 12px 3px 16px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #c0c0c0; font-size: 12.5px; }
+  .folder:hover { background: #2f2f2f; }
+  .folder.open { color: #dcddde; }
+  .folder .icon { font-size: 11px; color: #888; width: 12px; }
+  .file { padding: 3px 12px 3px 44px; cursor: pointer; font-size: 12.5px; color: #a0a0a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file:hover { background: #2f2f2f; color: #dcddde; }
+  .file.active { background: #3d5a80; color: #fff; }
+  .file.new { color: #a6e3a1; }
+  .sub-folder { padding: 3px 12px 3px 28px; display: flex; align-items: center; gap: 6px; color: #b0b0b0; font-size: 12.5px; }
+  .content { flex: 1; background: #1e1e1e; padding: 32px 40px; overflow-y: auto; }
+  .note-title { font-size: 26px; font-weight: 700; color: #e8e8e8; margin-bottom: 6px; }
+  .blockquote { border-left: 3px solid #4a9eff; padding: 8px 16px; margin: 12px 0 20px; color: #b0c4d8; font-style: italic; background: #252d38; border-radius: 0 6px 6px 0; font-size: 14px; }
+  .h2 { font-size: 16px; font-weight: 600; color: #c9d1d9; margin: 20px 0 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+  .p { color: #a0a8b4; line-height: 1.7; margin-bottom: 10px; font-size: 13.5px; }
+  .tag { background: #2d3748; color: #7dd3fc; border-radius: 4px; padding: 1px 7px; font-size: 11px; margin-right: 4px; }
+  .wikilink { color: #4a9eff; text-decoration: none; }
+  .frontmatter { background: #252525; border: 1px solid #333; border-radius: 6px; padding: 10px 14px; margin-bottom: 20px; font-size: 11.5px; color: #888; line-height: 1.8; }
+  .badge { display: inline-block; background: #1a3a1a; color: #a6e3a1; border-radius: 10px; padding: 1px 8px; font-size: 11px; margin-left: 6px; }
+  .toolbar { background: #252525; border-bottom: 1px solid #111; padding: 6px 16px; display: flex; gap: 12px; align-items: center; font-size: 11px; color: #666; flex-shrink: 0; }
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+    <span class="app-title">Obsidian — your Obsidian vault</span>
+  </div>
+  <div class="toolbar">
+    <span>📁 5_Notes/tool-calling.md</span>
+    <span style="margin-left:auto">Reading mode</span>
+  </div>
+  <div class="main">
+    <div class="sidebar">
+      <div class="vault-name">your Obsidian vault</div>
+      <div class="folder open"><span class="icon">▾</span> 📂 0_Inbox</div>
+      <div class="folder open"><span class="icon">▾</span> 📂 1_Projects</div>
+      <div class="sub-folder"><span class="icon">▸</span> Flight_Assistant <span class="badge">new</span></div>
+      <div class="sub-folder"><span class="icon">▸</span> Your_Project_Palace</div>
+      <div class="folder"><span class="icon">▸</span> 📂 2_Areas</div>
+      <div class="folder"><span class="icon">▸</span> 📂 3_Resources</div>
+      <div class="folder"><span class="icon">▸</span> 📂 4_Archive</div>
+      <div class="folder open"><span class="icon">▾</span> 📂 5_Notes</div>
+      <div class="file new active">tool-calling.md ✦</div>
+      <div class="file new">prompt-caching.md ✦</div>
+      <div class="file">rag-chunking.md</div>
+      <div class="file">harness.md</div>
+      <div class="file">hooks.md</div>
+      <div class="file">mcp.md</div>
+      <div class="file">plan-mode.md</div>
+      <div class="file">skills.md</div>
+      <div class="file">subagents.md</div>
+      <div class="folder open"><span class="icon">▾</span> 📂 6_MOCs</div>
+      <div class="file new">AI_Engineering_MOC.md ✦</div>
+      <div class="file">Claude_Code_MOC.md</div>
+    </div>
+    <div class="content">
+      <div class="frontmatter">
+        <span style="color:#666">type:</span> concept &nbsp;·&nbsp;
+        <span style="color:#666">tags:</span> <span class="tag">ai</span><span class="tag">tool-calling</span><span class="tag">agentic-ai</span> &nbsp;·&nbsp;
+        <span style="color:#666">created:</span> 2026-05-24
+      </div>
+      <div class="note-title">tool-calling</div>
+      <div class="blockquote">Tool calling is how Claude acts on the world — without it, LLMs can only talk; with it, they can run code, read files, and trigger APIs.</div>
+      <div class="h2">1️⃣ What is this really?</div>
+      <div class="p"><strong>Tool calling</strong> (also called function calling) is a structured protocol where the LLM outputs a JSON object naming a function and its arguments instead of prose. The host runtime intercepts this, executes the real function, and returns the result to the model. The model then continues generating — incorporating the real result into its response.</div>
+      <div class="h2">2️⃣ Concrete example (from my work)</div>
+      <div class="p">Building Flight Assistant: when a user asks "is my flight delayed?", Claude calls <code>get_flight_status(flight_id="AA123")</code>. The harness intercepts, hits the airline API, returns live data. Claude then answers with real departure times — not a hallucinated guess.</div>
+      <div class="h2">Related</div>
+      <div class="p">
+        <a class="wikilink">[[harness]]</a> · <a class="wikilink">[[mcp]]</a> · <a class="wikilink">[[prompt-caching]]</a> · <a class="wikilink">[[AI_Engineering_MOC]]</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

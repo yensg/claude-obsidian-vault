@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; background: #1e1e1e; color: #dcddde; width: 820px; }
+  .titlebar { background: #2b2b2b; height: 38px; display: flex; align-items: center; padding: 0 16px; gap: 8px; border-bottom: 1px solid #111; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .red { background: #ff5f57; } .yellow { background: #ffbd2e; } .green { background: #28c840; }
+  .app-title { color: #888; font-size: 12px; margin-left: 12px; }
+  .toolbar { background: #252525; border-bottom: 1px solid #111; padding: 6px 16px; font-size: 11px; color: #666; }
+  .content { padding: 36px 56px 48px; }
+  h1 { font-size: 28px; font-weight: 700; color: #e8e8e8; margin-bottom: 10px; }
+  .blockquote { border-left: 3px solid #4a9eff; padding: 10px 18px; margin: 0 0 28px; color: #b0c4d8; font-style: italic; background: #252d38; border-radius: 0 6px 6px 0; font-size: 15px; line-height: 1.5; }
+  h2 { font-size: 15px; font-weight: 600; color: #c9d1d9; margin: 24px 0 8px; border-bottom: 1px solid #2a2a2a; padding-bottom: 5px; }
+  p { color: #a0a8b4; line-height: 1.75; margin-bottom: 10px; font-size: 13.5px; }
+  code { background: #2a2a2a; border-radius: 3px; padding: 1px 5px; font-family: 'SF Mono', monospace; font-size: 12px; color: #89dceb; }
+  .wikilink { color: #4a9eff; }
+  .tag { background: #2d3748; color: #7dd3fc; border-radius: 4px; padding: 1px 7px; font-size: 11px; margin-right: 4px; display: inline-block; }
+  .anti { color: #f38ba8; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12.5px; }
+  th { background: #252525; padding: 7px 12px; text-align: left; color: #888; font-weight: 600; border: 1px solid #333; }
+  td { padding: 6px 12px; border: 1px solid #2a2a2a; color: #a0a8b4; }
+  .confidence { color: #6c7086; font-size: 11px; font-style: italic; }
+  ul { margin-left: 20px; color: #a0a8b4; line-height: 1.8; font-size: 13.5px; }
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+    <span class="app-title">Obsidian — 5_Notes/prompt-caching.md</span>
+  </div>
+  <div class="toolbar">Reading mode &nbsp;·&nbsp; <span class="tag">ai</span><span class="tag">claude-code</span><span class="tag">prompt-eng</span></div>
+  <div class="content">
+    <h1>prompt-caching</h1>
+    <div class="blockquote">Prompt caching cuts token cost by up to 90% by reusing stable prompt prefixes — the most impactful single optimisation for high-frequency Claude API calls.</div>
+
+    <h2>1️⃣ What is this really?</h2>
+    <p>Claude's API caches a prefix of your prompt so repeated calls reuse the cached tokens rather than reprocessing them. The cached prefix must be at least 1,024 tokens and is marked with <code>cache_control: {type: "ephemeral"}</code>. Cache TTL is 5 minutes. <span class="confidence">(extracted)</span></p>
+
+    <h2>2️⃣ Concrete example (from my work)</h2>
+    <p>The <code>/vault</code> skill has a large system prompt (the full SKILL.md instructions). On every invocation, that prefix is stable — only the user's conversation changes. With caching: the first call computes the prefix, subsequent calls within 5 min pay only output tokens on the cached segment. Result: ~80% cost reduction on long sessions. <span class="confidence">(inferred — applied from Anthropic's published cache hit rate)</span></p>
+
+    <h2>4️⃣ Compare / contrast</h2>
+    <table>
+      <tr><th>Approach</th><th>Cost model</th><th>When to use</th></tr>
+      <tr><td>No caching</td><td>Full input tokens every call</td><td>Short, one-off prompts</td></tr>
+      <tr><td>Prompt caching</td><td>Write once, read cheap (5 min TTL)</td><td>Repeated calls with stable prefix</td></tr>
+      <tr><td>Batch API</td><td>50% discount, async</td><td>Non-real-time bulk processing</td></tr>
+    </table>
+
+    <h2>5️⃣ Anti-patterns (what NOT to do)</h2>
+    <ul>
+      <li><span class="anti">Don't cache dynamic content</span> (timestamps, user IDs) — defeats the purpose; every call is a cache miss.</li>
+      <li><span class="anti">Don't forget the 5-minute TTL</span> — long gaps between calls evict the cache silently; budget accordingly.</li>
+      <li><span class="anti">Don't put cache_control mid-prefix</span> — only the last marked breakpoint is cached; earlier marks are ignored. <span class="confidence">(extracted)</span></li>
+    </ul>
+
+    <h2>Related</h2>
+    <p><span class="wikilink">[[tool-calling]]</span> · <span class="wikilink">[[context-assembly]]</span> · <span class="wikilink">[[harness]]</span> · <span class="wikilink">[[AI_Engineering_MOC]]</span></p>
+
+    <h2>Refinements</h2>
+    <p style="color:#6c7086; font-size:12px;">- 2026-05-24: initial capture from Flight Assistant session</p>
+  </div>
+</body>
+</html>
