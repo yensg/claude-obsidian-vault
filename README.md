@@ -85,25 +85,25 @@ Run `/vault` inside the Claude Code conversation you want to capture. The skill 
 
 > Replace these placeholders with real screenshots after running the skill once.
 
-**1. Claude previews notes before writing**
+**1. Quickstart — install in 3 commands**
 
-![Running /vault in Claude Code terminal](docs/screenshots/01-vault-command.png)
-*Claude extracts key findings and lists proposed notes for confirmation. Nothing is written until you approve.*
+![Quickstart installation steps](docs/screenshots/01-vault-command.png)
+*Copy the skill file, set your vault path, and run `/vault` at the end of any session.*
 
-**2. Notes appear in Obsidian instantly**
+**2. The project on GitHub**
 
-![New notes appear in Obsidian file tree](docs/screenshots/02-notes-in-obsidian.png)
-*Atomic notes land in `5_Notes/`, linked projects update in `1_Projects/`. Plain Markdown — no plugin needed to open them.*
+![claude-obsidian-vault repo on GitHub](docs/screenshots/02-notes-in-obsidian.png)
+*One file to install (`SKILL.md`). No dependencies, no Obsidian plugins, no account required.*
 
-**3. Example generated note**
+**3. Example note output**
 
-![Atomic note with emoji sections](docs/screenshots/03-atomic-note.png)
-*Every note opens with a one-line claim, then concrete examples, anti-patterns, and open questions.*
+![Example generated atomic note](docs/screenshots/03-atomic-note.png)
+*Every note follows the same 8-section template: claim, concrete example, anti-patterns, open questions, wiki-links.*
 
-**4. Query mode answers from your vault**
+**4. All available commands**
 
-![/vault --query answering from vault notes](docs/screenshots/04-query-mode.png)
-*`/vault --query "what did I decide about X?"` — Claude answers from your accumulated notes, not its training data.*
+![Vault command modes table](docs/screenshots/04-query-mode.png)
+*Seven modes: capture, batch inbox, query, lint, stats, ingest, and help.*
 
 ---
 
