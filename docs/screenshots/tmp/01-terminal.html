@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #1e1e2e; font-family: 'SF Mono', 'Menlo', 'Monaco', monospace; font-size: 13px; line-height: 1.6; width: 780px; }
+  body { background: #1e1e2e; font-family: 'SF Mono', 'Menlo', 'Monaco', monospace; font-size: 13px; line-height: 1.6; width: 820px; }
   .window { border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
   .titlebar { background: #2a2a3d; padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
   .dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -24,6 +24,13 @@
   .confirm { color: #cba6f7; }
   .blank { height: 6px; }
   .skill-label { color: #fab387; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 4px 0; }
+  th { color: #6c7086; font-weight: normal; padding: 3px 14px 3px 4px; text-align: left; border-bottom: 1px solid #313244; white-space: nowrap; }
+  td { padding: 3px 14px 3px 4px; border-bottom: 1px solid #1e1e2e; white-space: nowrap; }
+  td:first-child { color: #a6e3a1; text-align: center; padding-left: 0; }
+  td.finding { color: #cdd6f4; }
+  td.type { color: #f9e2af; }
+  td.path { color: #89dceb; }
 </style>
 </head>
 <body>
@@ -43,12 +50,35 @@
     <div class="blank"></div>
     <div class="section">Step 2 — Findings from this conversation</div>
     <div class="blank"></div>
-    <div><span class="dim">│ # │ Finding                                    │ Type      │ Path                                    │</span></div>
-    <div><span class="dim">│───│────────────────────────────────────────────│───────────│─────────────────────────────────────────│</span></div>
-    <div><span class="dim">│ </span><span class="note-num">1</span><span class="dim"> │ </span><span class="prompt">Tool calling — how Claude invokes functions </span><span class="dim">│ </span><span class="note-type">concept</span><span class="dim">   │ </span><span class="note-path">5_Notes/tool-calling.md</span><span class="dim">                  │</span></div>
-    <div><span class="dim">│ </span><span class="note-num">2</span><span class="dim"> │ </span><span class="prompt">RAG chunking strategy for embedding models  </span><span class="dim">│ </span><span class="note-type">concept</span><span class="dim">   │ </span><span class="note-path">5_Notes/rag-chunking.md</span><span class="dim">                  │</span></div>
-    <div><span class="dim">│ </span><span class="note-num">3</span><span class="dim"> │ </span><span class="prompt">Flight Assistant project architecture       </span><span class="dim">│ </span><span class="note-type">project</span><span class="dim">   │ </span><span class="note-path">1_Projects/Flight_Assistant/notes/arch.md</span><span class="dim">│</span></div>
-    <div><span class="dim">│ </span><span class="note-num">4</span><span class="dim"> │ </span><span class="prompt">Prompt caching — 5 min TTL, 80% cost save  </span><span class="dim">│ </span><span class="note-type">concept</span><span class="dim">   │ </span><span class="note-path">5_Notes/prompt-caching.md</span><span class="dim">               │</span></div>
+    <table>
+      <tr>
+        <th>#</th><th>Finding</th><th>Type</th><th>Path</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td class="finding">Tool calling — how Claude invokes functions</td>
+        <td class="type">concept</td>
+        <td class="path">5_Notes/tool-calling.md</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td class="finding">RAG chunking strategy for embedding models</td>
+        <td class="type">concept</td>
+        <td class="path">5_Notes/rag-chunking.md</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td class="finding">Flight Assistant project architecture</td>
+        <td class="type">project</td>
+        <td class="path">1_Projects/Flight_Assistant/notes/arch.md</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td class="finding">Prompt caching — 5 min TTL, 80% cost save</td>
+        <td class="type">concept</td>
+        <td class="path">5_Notes/prompt-caching.md</td>
+      </tr>
+    </table>
     <div class="blank"></div>
     <div><span class="confirm">Proceed with this plan, or adjust? </span><span class="dim">[yes/adjust]</span><span class="prompt"> yes</span></div>
     <div class="blank"></div>
