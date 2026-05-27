@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# PreCompact hook: snapshot current session transcript to the your Obsidian vault
-# vault inbox before context compaction (manual /compact or auto) destroys
-# detail. Also injects a system reminder telling the LLM to prompt the user
-# to run /vault.
+# PreCompact hook: snapshot current session transcript to your vault's inbox
+# before context compaction (manual /compact or auto) destroys detail. Also
+# injects a system reminder telling the LLM to prompt the user to run /vault.
 #
 # WARNING: the dump includes the full transcript — API keys, tokens, file paths,
-# and any other sensitive content visible in the session. The dump lands in an
-# iCloud-synced Obsidian vault. Be aware of what is in your session before
-# triggering /compact.
+# and any other sensitive content visible in the session. The dump lands in your
+# Obsidian vault. Be aware of what is in your session before triggering /compact.
+#
+# Setup: set VAULT_INBOX to your vault's 0_Inbox folder path, or export it in
+# your shell profile.
 #
 # Contract: receives JSON on stdin with keys { transcript_path, trigger, ... }.
 # `trigger` is "manual" or "auto".
@@ -16,7 +17,15 @@
 
 set -euo pipefail
 
-VAULT_INBOX="/path/to/your/obsidian/vault/0_Inbox"
+# Configure: absolute path to your vault's 0_Inbox folder.
+# Example: /Users/yourname/path/to/vault/0_Inbox
+VAULT_INBOX="${VAULT_INBOX:-/path/to/your/obsidian/vault/0_Inbox}"
+
+if [ "$VAULT_INBOX" = "/path/to/your/obsidian/vault/0_Inbox" ]; then
+  printf '{"hookSpecificOutput":{"hookEventName":"PreCompact","additionalContext":"dump-before-compact.sh: VAULT_INBOX not configured. Edit the hook or export VAULT_INBOX=your/vault/0_Inbox in your shell profile."}}\n'
+  exit 0
+fi
+
 mkdir -p "$VAULT_INBOX"
 
 INPUT="$(cat)"

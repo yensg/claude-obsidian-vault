@@ -10,6 +10,10 @@
 # Limitation: this is a denylist, not a full allowlist. The skill's own path safety
 # gate (Step 4) is the primary confinement layer for vault writes.
 #
+# Setup: set VAULT_PROTECTED_NAME to the name of the vault you want to protect
+# (the one Claude should NEVER write to). Use the exact folder name as it appears
+# in the file path. Export it in your shell profile or edit this file directly.
+#
 # Contract: receives JSON on stdin with keys { tool_name, tool_input, ... }.
 # To block: emit JSON {"decision":"block","reason":"..."} on stdout, exit 0.
 
@@ -24,9 +28,10 @@ fi
 INPUT="$(cat)"
 TOOL_NAME="$(printf '%s' "$INPUT" | jq -r '.tool_name // empty')"
 
-# Protected vault: literal string match (grep -F), never regex.
-# Prior bug: "the owner\.s Main Vault" (regex) never matched the apostrophe.
-PROTECTED_LITERAL="My Main Vault"
+# Protected vault: the folder name Claude must never write to.
+# Set VAULT_PROTECTED_NAME in your environment or replace the default below.
+# Uses literal string match (grep -F) — apostrophes and special chars are safe.
+PROTECTED_LITERAL="${VAULT_PROTECTED_NAME:-My Protected Vault}"
 
 # Canonicalize a path (resolve symlinks, normalize ..). Falls back to original
 # path if realpath is unavailable or fails (macOS built-in lacks -m flag).

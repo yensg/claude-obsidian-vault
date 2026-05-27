@@ -1,7 +1,7 @@
 ---
 name: vault
 description: >
-  Save findings from the current conversation into the user's Obsidian "your Obsidian vault"
+  Save findings from the current conversation into the user's Obsidian
   second-brain vault. Auto-organizes notes using PARAZETTEL + MOC structure
   (PARA folders + Zettelkasten atomic notes + Maps of Content). Adds bidirectional
   links between projects, ideas, and concepts. Maintains a queryable knowledge graph
@@ -12,7 +12,7 @@ description: >
 
 # vault
 
-Save conversation findings into your Obsidian vault vault. Build a 2nd brain that grows.
+Save conversation findings into your Obsidian vault. Build a 2nd brain that grows.
 
 ## Vault path (constant — never change)
 
@@ -20,11 +20,13 @@ Save conversation findings into your Obsidian vault vault. Build a 2nd brain tha
 /path/to/your/obsidian/vault
 ```
 
+**One-time setup:** Replace `/path/to/your/obsidian/vault` above with the absolute path to your Obsidian vault folder. This path is used throughout the skill as `<VAULT>`.
+
 Refer to this below as `<VAULT>`.
 
 ## Hard safety rule
 
-**Never write, edit, or delete inside the user's other Obsidian vault** (the Main Vault one). That vault is read-only to this skill. Only `your Obsidian vault` is writable. Before every Write/Edit, self-check the target path. If path falls outside `<VAULT>`, refuse. A PreToolUse hook also enforces this independently.
+**Never write, edit, or delete inside any other Obsidian vault** (only your designated `<VAULT>` is writable). Before every Write/Edit, self-check the target path. If the path falls outside `<VAULT>`, refuse. A PreToolUse hook can also enforce this independently (see `hooks/protect-mind-palace.sh`).
 
 ## Folder layout (already exists)
 
