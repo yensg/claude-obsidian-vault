@@ -1,0 +1,17 @@
+# .publish-env.example — copy to .publish-env and fill in your values.
+# .publish-env is gitignored and never committed.
+
+# Absolute path to your writable Obsidian vault
+VAULT_PERSONAL_PATH="/path/to/your/obsidian/vault"
+
+# Name of your writable vault (as it appears in SKILL.md text)
+VAULT_PERSONAL_NAME="My Second Brain"
+
+# Name of your protected/read-only vault (the one Claude must never write to)
+VAULT_PROTECTED_NAME="My Main Vault"
+
+# Your personal project names referenced in the voice & style examples
+VAULT_OWNER_PROJECTS="your projects, your work, your hobbies"
+
+# Your first name (used to strip "<Name>'s verbal tics" → generic section header, etc.)
+VAULT_OWNER_NAME="YourName"

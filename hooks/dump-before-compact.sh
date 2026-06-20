@@ -17,6 +17,12 @@
 
 set -euo pipefail
 
+# Hard dependency check — fail loudly rather than silently allowing on parse failure.
+if ! command -v jq >/dev/null 2>&1; then
+  printf '{"hookSpecificOutput":{"hookEventName":"PreCompact","additionalContext":"dump-before-compact.sh: jq not found — cannot parse hook input. Install jq to enable vault dumps."}}\n'
+  exit 0
+fi
+
 # Configure: absolute path to your vault's 0_Inbox folder.
 # Example: /Users/yourname/path/to/vault/0_Inbox
 VAULT_INBOX="${VAULT_INBOX:-/path/to/your/obsidian/vault/0_Inbox}"
@@ -31,6 +37,8 @@ mkdir -p "$VAULT_INBOX"
 INPUT="$(cat)"
 TRANSCRIPT_PATH="$(printf '%s' "$INPUT" | jq -r '.transcript_path // empty')"
 TRIGGER="$(printf '%s' "$INPUT" | jq -r '.trigger // "unknown"')"
+# Sanitize trigger to safe YAML chars before embedding in frontmatter.
+TRIGGER_SAFE="$(printf '%s' "$TRIGGER" | tr -dc 'a-zA-Z0-9_-' | head -c 64)"
 
 TS="$(date +%Y%m%d_%H%M%S)"
 # Use mktemp to avoid same-second collision overwrites.
@@ -42,7 +50,7 @@ TARGET="$(mktemp "$VAULT_INBOX/precompact_${TS}_XXXXXX.md")"
   echo "type: raw-capture"
   echo "tags: [inbox, precompact, needs-refinement]"
   echo "created: $(date +%Y-%m-%d)"
-  echo "trigger: $TRIGGER"
+  echo "trigger: $TRIGGER_SAFE"
   echo "---"
   echo
   echo "# Raw transcript before compaction"
@@ -52,9 +60,9 @@ TARGET="$(mktemp "$VAULT_INBOX/precompact_${TS}_XXXXXX.md")"
   if [[ -n "$TRANSCRIPT_PATH" && -f "$TRANSCRIPT_PATH" ]]; then
     echo "_Source: \`$TRANSCRIPT_PATH\`_"
     echo
-    echo '```jsonl'
+    echo '````jsonl'
     cat "$TRANSCRIPT_PATH"
-    echo '```'
+    echo '````'
   else
     echo "_(Transcript path not provided by harness — refer to ~/.claude/sessions/ manually.)_"
   fi

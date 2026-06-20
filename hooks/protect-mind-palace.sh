@@ -64,8 +64,9 @@ _bash_writes_protected() {
 }
 
 case "$TOOL_NAME" in
-  Write|Edit|NotebookEdit)
-    FP="$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty')"
+  Write|Edit|NotebookEdit|MultiEdit)
+    # NotebookEdit uses notebook_path; all others use file_path.
+    FP="$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // .tool_input.notebook_path // empty')"
 
     # Layer 1: block path traversal (../ or /..)
     if [[ -n "$FP" ]] && printf '%s' "$FP" | grep -qE '(^|/)\.\.(/|$)'; then

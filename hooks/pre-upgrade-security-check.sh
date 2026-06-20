@@ -28,17 +28,23 @@ TOOL_NAME="$(printf '%s' "$INPUT" | jq -r '.tool_name // empty')"
 CMD="$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')"
 
 # Intercept git upgrade commands in skill directories.
-# Expanded pattern covers: reset --hard, pull, fetch+checkout, fetch+merge.
+# Covers: cd+reset --hard, git -C reset --hard, pull, fetch+checkout/merge/reset.
 printf '%s' "$CMD" | grep -qE \
-  'git[[:space:]]+(reset[[:space:]]+--hard[[:space:]]+origin|pull[[:space:]]|fetch[[:space:]].*&&.*(checkout|merge|reset))' \
+  'git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+(reset[[:space:]]+--hard[[:space:]]+origin|pull[[:space:]]|fetch[[:space:]].*&&.*(checkout|merge|reset))' \
   || exit 0
 
 # --- Determine the skill directory ---
-# Try to extract from a quoted cd statement: cd "/path/.claude/skills/foo"
+# Try quoted cd form: cd "/path/.claude/skills/foo"
 SKILL_DIR=$(printf '%s' "$CMD" | \
   sed -n 's/.*cd[[:space:]]*"\([^"]*\.claude\/skills\/[^"]*\)".*/\1/p' | head -1)
 
-# Fallback: unquoted cd or inline path reference
+# Try git -C form: git -C "/path/.claude/skills/foo" reset --hard
+if [ -z "$SKILL_DIR" ]; then
+  SKILL_DIR=$(printf '%s' "$CMD" | \
+    sed -n 's/.*git[[:space:]]*-C[[:space:]]*"\([^"]*\.claude\/skills\/[^"]*\)".*/\1/p' | head -1)
+fi
+
+# Fallback: unquoted path reference
 if [ -z "$SKILL_DIR" ]; then
   SKILL_DIR=$(printf '%s' "$CMD" | \
     grep -oE '[^[:space:]";&]+\.claude/skills/[a-zA-Z0-9_-]+' | head -1)
@@ -47,6 +53,7 @@ fi
 
 SKILL_NAME=$(basename "${SKILL_DIR:-unknown}")
 LOG="$HOME/.claude/upgrade-security.log"
+mkdir -p "$(dirname "$LOG")" 2>/dev/null || true
 
 # If we still can't find a git repo, log and allow (don't block what we can't inspect)
 if [ -z "$SKILL_DIR" ] || [ ! -d "$SKILL_DIR/.git" ]; then
@@ -55,16 +62,27 @@ if [ -z "$SKILL_DIR" ] || [ ! -d "$SKILL_DIR/.git" ]; then
   exit 0
 fi
 
-# Fetch incoming changes (idempotent — the upgrade command will re-fetch)
-git -C "$SKILL_DIR" fetch origin --quiet 2>/dev/null || {
-  printf '[%s] WARN: git fetch failed for %s — allowing upgrade\n' \
+# Fetch incoming changes (idempotent — the upgrade command will re-fetch).
+# Use timeout (gtimeout on macOS via brew, timeout on Linux) to prevent
+# stalling the Claude session on an unreachable remote.
+if command -v gtimeout >/dev/null 2>&1; then
+  gtimeout 15 git -C "$SKILL_DIR" fetch origin --quiet 2>/dev/null
+elif command -v timeout >/dev/null 2>&1; then
+  timeout 15 git -C "$SKILL_DIR" fetch origin --quiet 2>/dev/null
+else
+  git -C "$SKILL_DIR" fetch origin --quiet 2>/dev/null
+fi || {
+  printf '[%s] WARN: git fetch failed or timed out for %s — allowing upgrade\n' \
     "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SKILL_NAME" >> "$LOG"
   exit 0
 }
 
 CURRENT_SHA=$(git -C "$SKILL_DIR" rev-parse HEAD 2>/dev/null || echo "unknown")
-INCOMING_SHA=$(git -C "$SKILL_DIR" rev-parse origin/main 2>/dev/null || echo "unknown")
-COMMIT_COUNT=$(git -C "$SKILL_DIR" rev-list HEAD..origin/main --count 2>/dev/null || echo "0")
+# Discover the actual default branch instead of hardcoding origin/main.
+DEFAULT_BRANCH=$(git -C "$SKILL_DIR" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
+  | sed 's|refs/remotes/origin/||' || echo "main")
+INCOMING_SHA=$(git -C "$SKILL_DIR" rev-parse "origin/$DEFAULT_BRANCH" 2>/dev/null || echo "unknown")
+COMMIT_COUNT=$(git -C "$SKILL_DIR" rev-list "HEAD..origin/$DEFAULT_BRANCH" --count 2>/dev/null || echo "0")
 
 printf '[%s] Checking %s: %s -> %s (%s new commits)\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$SKILL_NAME" \
@@ -74,7 +92,7 @@ printf '[%s] Checking %s: %s -> %s (%s new commits)\n' \
 [ "$COMMIT_COUNT" = "0" ] && exit 0
 
 # Get the full diff
-DIFF=$(git -C "$SKILL_DIR" diff HEAD..origin/main 2>/dev/null || echo "")
+DIFF=$(git -C "$SKILL_DIR" diff "HEAD..origin/$DEFAULT_BRANCH" 2>/dev/null || echo "")
 
 # Extract added lines from all files — INCLUDING .md and .tmpl.
 # Previously .md/.tmpl were excluded, but SKILL.md/templates are the primary
@@ -109,9 +127,10 @@ _block() {
 
 # --- Tier 1: always block ---
 
-# Piping a download directly to a shell interpreter
+# Piping a download directly to a shell interpreter.
+# Matches any form: curl <flags> <url> | bash, curl <url> | bash, wget ... | sh, etc.
 _block "remote-code-execution" \
-  '(curl|wget)[[:space:]]+[^[:space:]]+[[:space:]]*\|[[:space:]]*(bash|sh|zsh|python|node|perl|ruby)'
+  '(curl|wget)[[:space:]].*\|[[:space:]]*(bash|sh|zsh|python[23]?|node|perl|ruby)'
 
 # Base64-decode piped into a shell interpreter (not jq/cat/etc.)
 _block "base64-execute" \
@@ -188,7 +207,7 @@ if [ -n "$BLOCK_REASON" ]; then
     --arg log "$LOG" \
     '{
       decision: "block",
-      reason: ("Upgrade blocked for \($skill): \($reason).\n\nTo inspect the diff manually:\n  git -C \($dir) diff HEAD..origin/main\n\nSecurity log: \($log)")
+      reason: ("Upgrade blocked for \($skill): \($reason).\n\nTo inspect the diff manually:\n  git -C \($dir) diff HEAD..origin/<default-branch>\n\nSecurity log: \($log)")
     }'
   exit 0
 fi
