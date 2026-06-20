@@ -1,7 +1,7 @@
 # save-to-vault
 
 Claude Code skill that exports conversation findings into the user's Obsidian
-"your Obsidian vault" vault as a personal 2nd brain.
+vault as a personal 2nd brain.
 
 ## What it does
 

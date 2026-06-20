@@ -82,7 +82,7 @@ diff ~/.claude/skills/vault/SKILL.md \
 
 ## Intent preservation oracle
 
-This skill does: **Save conversation findings into your Obsidian vault vault. Build a 2nd brain with PARAZETTEL+MOC structure.**
+This skill does: **Save conversation findings into your Obsidian vault. Build a 2nd brain with PARAZETTEL+MOC structure.**
 
 Any test change that causes the skill to:
 - Write outside VAULT → FAIL (violates hard safety rule)

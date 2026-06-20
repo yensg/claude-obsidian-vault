@@ -49,7 +49,7 @@ check "deep resource subfolder" "$VAULT/3_Resources/Singapore Property/hdb-rules
 check "dotdot traversal"      "$VAULT/../evil.md"                                      "unsafe"
 check "deep dotdot"           "$VAULT/5_Notes/../../etc/passwd"                        "unsafe"
 check "absolute outside vault" "/tmp/evil.md"                                          "unsafe"
-check "home dir escape"       "/Users/otheruser/.claude/skills/vault/evil.md"            "unsafe"
+check "home dir escape"       "/Users/otheruser/.claude/skills/vault/evil.md"         "unsafe"
 check "dotdot in subfolder"   "$VAULT/5_Notes/../../../.ssh/authorized_keys"           "unsafe"
 check "dotdot percent encoded" "$VAULT/5_Notes/..%2F..%2Fevil.md"                     "unsafe"
 check "vault-evil suffix"     "${VAULT}-evil/note.md"                                  "unsafe"
